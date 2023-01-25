@@ -155,7 +155,7 @@ instance (P : Lines → Prop) [∀ l, Decidable (P l)] : Decidable (∃ l, P l) 
       simp [not_forall, not_not] at h
       exact h
 
-instance : Geometry Points where
+instance FanoGeometry : Geometry Points where
   line := Lines
   instMem := FanoMembership
 
