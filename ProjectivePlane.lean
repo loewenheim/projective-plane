@@ -24,11 +24,11 @@ class ProjectivePlane (P : Type _) extends Geometry P :=
   exists_quadrangle : ∃ (p q r s : P), Geometry.isQuadrangle p q r s
 
 namespace ProjectivePlane
-open Classical
+open Geometry
 
 variable {p q : P}
 
-noncomputable def connectingLine [inst : ProjectivePlane P] (p q : P) : inst.line := Exists.choose <| exists_connecting_line p q
+noncomputable def connectingLine [ProjectivePlane P] (p q : P) : line P := Exists.choose <| exists_connecting_line p q
 
 infix:75 " ⊔ " => connectingLine
 
@@ -38,7 +38,7 @@ theorem connectingLine_left [ProjectivePlane P] : ∀ p q : P,  p ∈ p ⊔ q :=
 theorem connectingLine_right [ProjectivePlane P] : ∀ p q : P,  q ∈ p ⊔ q :=
     λ p q => (Exists.choose_spec (exists_connecting_line p q)).right
 
-theorem connectingLine_uniq [inst : ProjectivePlane P] : ∀ (p q : P) (l : inst.line), p ≠ q → p ∈ l → q ∈ l → l = p ⊔ q :=
+theorem connectingLine_uniq [ProjectivePlane P] : ∀ (p q : P) (l : line P), p ≠ q → p ∈ l → q ∈ l → l = p ⊔ q :=
 by intro p q l hpq hpl hql
    have hpm : p ∈ p ⊔ q := connectingLine_left p q
    have hqm : q ∈ p ⊔ q := connectingLine_right p q 
@@ -53,17 +53,17 @@ theorem connectingLine_comm [ProjectivePlane P] : ∀ (p q : P), p ≠ q -> p �
   have hqm : q ∈ q ⊔ p := connectingLine_left q p
   exact Eq.symm (connectingLine_uniq p q (q ⊔ p) hpq hpm hqm)
 
-noncomputable def intersectionPoint [inst : ProjectivePlane P] (l m : inst.line) : P := Exists.choose <| exists_intersection_point l m
+noncomputable def intersectionPoint [ProjectivePlane P] (l m : line P) : P := Exists.choose <| exists_intersection_point l m
 
 infix:75 " ⊓ " => intersectionPoint
 
-theorem intersectionPoint_left [inst : ProjectivePlane P] : ∀ l m : inst.line,  l ⊓ m ∈ l :=
+theorem intersectionPoint_left [ProjectivePlane P] : ∀ l m : line P,  l ⊓ m ∈ l :=
     λ l m => (Exists.choose_spec (exists_intersection_point l m)).left
 
-theorem intersectionPoint_right [inst : ProjectivePlane P] : ∀ l m : inst.line,  l ⊓ m ∈ m :=
+theorem intersectionPoint_right [ProjectivePlane P] : ∀ l m : line P,  l ⊓ m ∈ m :=
     λ l m => (Exists.choose_spec (exists_intersection_point l m)).right
 
-theorem intersectionPoint_uniq [inst : ProjectivePlane P] : ∀ (l m : inst.line) (p : P), l ≠ m → p ∈ l → p ∈ m → p = l ⊓ m :=
+theorem intersectionPoint_uniq [ProjectivePlane P] : ∀ (l m : line P) (p : P), l ≠ m → p ∈ l → p ∈ m → p = l ⊓ m :=
 by intro l m p hlm hpl hpm
    have hql : l ⊓ m ∈ l:= intersectionPoint_left l m
    have hqm : l ⊓ m ∈ m:= intersectionPoint_right l m 
@@ -74,6 +74,8 @@ by intro l m p hlm hpl hpm
 end ProjectivePlane
 
 namespace Fano
+open Geometry
+
 inductive Points where
   | p1
   | p2
@@ -166,7 +168,7 @@ def Fano.exists_intersection_point : ∀ (l m : Lines), ∃ p : Points, p ∈ l 
   decide
  
 theorem Fano.quadrangle1236 : Geometry.isQuadrangle Points.p1 Points.p2 Points.p3 Points.p6 :=
-  ⟨by simp[Geometry.collinear], by simp[Geometry.collinear], by simp[Geometry.collinear], by simp[Geometry.collinear]⟩
+  ⟨by simp[collinear], by simp[collinear], by simp[collinear], by simp[collinear]⟩
 
 theorem Fano.point_line_uniq : ∀ {p q : Points} {l m : Lines}, p ∈ l -> q ∈ l -> p ∈ m -> q ∈ m -> p = q ∨ l = m := by
   decide
