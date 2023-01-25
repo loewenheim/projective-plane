@@ -28,7 +28,7 @@ open Classical
 
 variable {p q : P}
 
-def connectingLine [inst : ProjectivePlane P] (p q : P) : inst.line := Exists.choose (exists_connecting_line p q)
+noncomputable def connectingLine [inst : ProjectivePlane P] (p q : P) : inst.line := Exists.choose <| exists_connecting_line p q
 
 infix:75 " ⊔ " => connectingLine
 
@@ -53,7 +53,7 @@ theorem connectingLine_comm [ProjectivePlane P] : ∀ (p q : P), p ≠ q -> p �
   have hqm : q ∈ q ⊔ p := connectingLine_left q p
   exact Eq.symm (connectingLine_uniq p q (q ⊔ p) hpq hpm hqm)
 
-def intersectionPoint [inst : ProjectivePlane P] (l m : inst.line) : P := Exists.choose $ exists_intersection_point l m 
+noncomputable def intersectionPoint [inst : ProjectivePlane P] (l m : inst.line) : P := Exists.choose <| exists_intersection_point l m
 
 infix:75 " ⊓ " => intersectionPoint
 
@@ -71,7 +71,6 @@ by intro l m p hlm hpl hpm
    cases h with
     | inl h' => exact h'
     | inr hlm' => contradiction
-
 end ProjectivePlane
 
 namespace Fano
