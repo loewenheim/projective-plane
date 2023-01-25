@@ -168,7 +168,7 @@ def Fano.exists_intersection_point : ∀ (l m : Lines), ∃ p : Points, p ∈ l 
   decide
  
 theorem Fano.quadrangle1236 : Geometry.isQuadrangle Points.p1 Points.p2 Points.p3 Points.p6 :=
-  ⟨by simp[collinear], by simp[collinear], by simp[collinear], by simp[collinear]⟩
+  ⟨by simp[collinear, line], by simp[collinear, line], by simp[collinear, line], by simp[collinear, line]⟩
 
 theorem Fano.point_line_uniq : ∀ {p q : Points} {l m : Lines}, p ∈ l -> q ∈ l -> p ∈ m -> q ∈ m -> p = q ∨ l = m := by
   decide
