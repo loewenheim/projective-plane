@@ -25,6 +25,15 @@ instance dual [Geometry P] : Geometry (line P) where
   line := P
   incidence := ⟨fun l p => p ∈ l⟩
 
+theorem triangle_rotate [Geometry P] : ¬ collinear p q r -> ¬ collinear q r p := by
+  simp[collinear]
+  intro triangle_pqr l hq hr hp
+  apply triangle_pqr <;> assumption
+
+theorem quadrangle_rotate [Geometry P] : isQuadrangle p q r s -> isQuadrangle q r s p := by
+  intro ⟨triangle_pqr, triangle_pqs, triangle_prs, triangle_qrs⟩
+  exact ⟨triangle_qrs, triangle_rotate triangle_pqr, triangle_rotate triangle_pqs, triangle_rotate triangle_prs⟩
+
 end Geometry
 
 class ProjectivePlane (P : Type _) extends Geometry P :=
