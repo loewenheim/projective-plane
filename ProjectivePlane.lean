@@ -4,9 +4,9 @@ variable {P L : Type}
 
 class Geometry (P : Type _) where
   line : Type _
-  instMem : Membership P line
+  incidence : Membership P line
 
-attribute [instance] Geometry.instMem
+attribute [instance] Geometry.incidence
 
 def Geometry.collinear [Geometry P] (p q r : P) : Prop :=
   ∃ l : line P, p ∈ l ∧ q ∈ l ∧ r ∈ l 
