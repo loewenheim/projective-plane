@@ -108,6 +108,10 @@ def Lines.points : Lines → List Points
 instance FanoMembership : Membership Points Lines where
   mem p l := p ∈ l.points
 
+instance FanoGeometry : Geometry Points where
+line := Lines
+incidence := FanoMembership
+
 instance (p : Points) (l : Lines) : Decidable (p ∈ l) := by
   cases l <;> rw [FanoMembership] <;> simp <;> infer_instance
 
@@ -157,9 +161,6 @@ instance (P : Lines → Prop) [∀ l, Decidable (P l)] : Decidable (∃ l, P l) 
       simp [not_forall, not_not] at h
       exact h
 
-instance FanoGeometry : Geometry Points where
-  line := Lines
-  instMem := FanoMembership
 
 def Fano.exists_connecting_line : ∀ (p q : Points), ∃ l : Lines, p ∈ l ∧ q ∈ l := by
   decide
