@@ -52,7 +52,13 @@ theorem connectingLine_comm [ProjectivePlane P] : ∀ (p q : P), p ≠ q -> p �
   have hpm : p ∈ q ⊔ p := connectingLine_right q p
   have hqm : q ∈ q ⊔ p := connectingLine_left q p
   exact Eq.symm (connectingLine_uniq p q (q ⊔ p) hpq hpm hqm)
+@[simp] theorem connectingLine_left [ProjectivePlane P] : ∀ (p q : P),  p ∈ p ⊔ q := by
+    intro p q
+    exact (Exists.choose_spec (exists_connecting_line p q)).left
 
+@[simp] theorem connectingLine_right [ProjectivePlane P] : ∀ (p q : P),  q ∈ p ⊔ q := by
+    intro p q
+    exact (Exists.choose_spec (exists_connecting_line p q)).right
 noncomputable def intersectionPoint [ProjectivePlane P] (l m : line P) : P := Exists.choose <| exists_intersection_point l m
 
 infix:75 " ⊓ " => intersectionPoint
@@ -71,6 +77,14 @@ by intro l m p hlm hpl hpm
    cases h with
     | inl h' => exact h'
     | inr hlm' => contradiction
+@[simp] theorem intersectionPoint_left [ProjectivePlane P] : ∀ (l m : line P),  l ⊓ m ∈ l := by
+    intro l m
+    exact (Exists.choose_spec (exists_intersection_point l m)).left
+
+@[simp] theorem intersectionPoint_right [ProjectivePlane P] : ∀ (l m : line P),  l ⊓ m ∈ m := by
+  intro l m
+  exact (Exists.choose_spec (exists_intersection_point l m)).right
+
 end ProjectivePlane
 
 namespace Fano
