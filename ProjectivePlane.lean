@@ -155,6 +155,132 @@ theorem dual_triangle [ProjectivePlane P] : ¬ collinear p q r -> ¬ collinear (
 
   contradiction
 
+
+theorem dual_quadrangle_part [ProjectivePlane P] : isQuadrangle p q r s -> ¬ collinear (p ⊔ q) (q ⊔ r) (r ⊔ s) := by
+  intro ⟨triangle_pqr, _, _, triangle_qrs⟩
+  let a := p ⊔ q
+  let b := q ⊔ r
+  let c := r ⊔ s
+
+  let t := a ⊓ c
+
+  have t_is_not_q : q ≠ t := by
+      intro h
+      -- if q = t = (p ⊔ q) ⊓ (r ⊔ s), then r ⊔ s contains q and hence q, r, s are collinear
+      have : collinear q r s := by
+        simp[collinear]
+        rw[h]
+        exists c
+        apply And.intro
+        . simp
+        . apply And.intro
+          . simp
+          . simp
+      contradiction
+
+  have t_is_not_r : r ≠ t := by
+    intro h
+    have : collinear p q r := by
+     simp[collinear]
+     rw[h]
+     exists a
+     apply And.intro
+     . simp
+     . apply And.intro
+       . simp
+       . simp
+    contradiction
+
+  have a_is_q_t : a = q ⊔ t := by
+      apply connectingLine_uniq
+      . assumption
+      . simp
+      . simp
+
+  have c_is_r_t : c = r ⊔ t := by
+    apply connectingLine_uniq
+    . assumption
+    . simp
+    . simp
+
+  have triangle_tqr :  ¬ collinear t q r := by
+    simp[collinear]
+    -- assume there is a line l containing q, r, t
+    intro l htl hql hrl
+
+    -- l = a because l contains both q and t
+    have l_is_a : l = a := by
+      rw[a_is_q_t]
+      apply connectingLine_uniq <;> assumption
+    rw[l_is_a] at hrl
+    -- a = l contains p, q, r
+    have : collinear p q r := by
+      simp[collinear]
+      exists a
+      apply And.intro
+      . simp
+      . apply And.intro
+        . simp
+        . assumption
+    contradiction
+
+  have : ¬ collinear a b c := by
+    rw[a_is_q_t, c_is_r_t, connectingLine_comm]
+    apply dual_triangle
+    assumption
+
+  assumption
+
+theorem dual_quadrangle [ProjectivePlane P] : isQuadrangle p q r s -> isQuadrangle (p ⊔ q) (q ⊔ r) (r ⊔ s) (s ⊔ p) := by
+  intro ⟨triangle_pqr, triangle_pqs, triangle_prs, triangle_qrs⟩
+  let a := p ⊔ q
+  let b := q ⊔ r
+  let c := r ⊔ s
+  let d := s ⊔ p
+
+  have triangle_abc : ¬ collinear a b c := by
+    apply dual_quadrangle_part
+    exact ⟨triangle_pqr, triangle_pqs, triangle_prs, triangle_qrs⟩
+
+  have triangle_abd : ¬ collinear a b d := by
+    apply triangle_rotate
+    apply dual_quadrangle_part
+    apply quadrangle_rotate
+    apply quadrangle_rotate
+    apply quadrangle_rotate
+    exact ⟨triangle_pqr, triangle_pqs, triangle_prs, triangle_qrs⟩
+
+  have triangle_acd : ¬ collinear a c d := by
+    apply triangle_rotate
+    apply triangle_rotate
+    apply dual_quadrangle_part
+    apply quadrangle_rotate
+    apply quadrangle_rotate
+    exact ⟨triangle_pqr, triangle_pqs, triangle_prs, triangle_qrs⟩
+
+  have triangle_bcd : ¬ collinear b c d := by
+    apply dual_quadrangle_part
+    apply quadrangle_rotate
+    exact ⟨triangle_pqr, triangle_pqs, triangle_prs, triangle_qrs⟩
+
+  exact ⟨triangle_abc, triangle_abd, triangle_acd, triangle_bcd⟩  
+
+instance dual [inst : ProjectivePlane P] : ProjectivePlane (line P) where
+  line := P
+  incidence := ⟨fun l p => p ∈ l⟩
+  exists_connecting_line := inst.exists_intersection_point
+  exists_intersection_point := inst.exists_connecting_line
+  point_line_uniq := by
+    intros
+    rw[or_comm]
+    apply inst.point_line_uniq <;> assumption
+  exists_quadrangle := 
+    match inst.exists_quadrangle with
+    | ⟨p, q, r, s, prf⟩ => ⟨ (p ⊔ q), (q ⊔ r), (r ⊔ s), (s ⊔ p), dual_quadrangle prf⟩
+    
+theorem dual_involution [h : ProjectivePlane P] :
+  let h' : ProjectivePlane (line (line P)) := inferInstance
+  h' = h := by rfl
 end ProjectivePlane
 
 namespace Fano
