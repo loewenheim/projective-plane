@@ -44,33 +44,14 @@ class ProjectivePlane (P : Type _) extends Geometry P :=
 
 namespace ProjectivePlane
 open Geometry
+open Classical
 
-variable {p q : P}
+variable {p q r s : P}
 
 noncomputable def connectingLine [ProjectivePlane P] (p q : P) : line P := Exists.choose <| exists_connecting_line p q
 
 infix:75 " ⊔ " => connectingLine
 
-theorem connectingLine_left [ProjectivePlane P] : ∀ p q : P,  p ∈ p ⊔ q :=
-    λ p q => (Exists.choose_spec (exists_connecting_line p q)).left
-
-theorem connectingLine_right [ProjectivePlane P] : ∀ p q : P,  q ∈ p ⊔ q :=
-    λ p q => (Exists.choose_spec (exists_connecting_line p q)).right
-
-theorem connectingLine_uniq [ProjectivePlane P] : ∀ (p q : P) (l : line P), p ≠ q → p ∈ l → q ∈ l → l = p ⊔ q :=
-by intro p q l hpq hpl hql
-   have hpm : p ∈ p ⊔ q := connectingLine_left p q
-   have hqm : q ∈ p ⊔ q := connectingLine_right p q 
-   have h : p = q ∨ l = p ⊔ q := point_line_uniq hpl hql hpm hqm
-   cases h with
-    | inl hpq' => contradiction
-    | inr h' => exact h'
-
-theorem connectingLine_comm [ProjectivePlane P] : ∀ (p q : P), p ≠ q -> p ⊔ q = q ⊔ p := by
-  intro p q hpq
-  have hpm : p ∈ q ⊔ p := connectingLine_right q p
-  have hqm : q ∈ q ⊔ p := connectingLine_left q p
-  exact Eq.symm (connectingLine_uniq p q (q ⊔ p) hpq hpm hqm)
 @[simp] theorem connectingLine_left [ProjectivePlane P] : ∀ (p q : P),  p ∈ p ⊔ q := by
     intro p q
     exact (Exists.choose_spec (exists_connecting_line p q)).left
@@ -78,24 +59,28 @@ theorem connectingLine_comm [ProjectivePlane P] : ∀ (p q : P), p ≠ q -> p �
 @[simp] theorem connectingLine_right [ProjectivePlane P] : ∀ (p q : P),  q ∈ p ⊔ q := by
     intro p q
     exact (Exists.choose_spec (exists_connecting_line p q)).right
+
+theorem connectingLine_uniq [ProjectivePlane P] : ∀ {p q : P} {l : line P}, p ≠ q → p ∈ l → q ∈ l → l = p ⊔ q := by
+  intro p q l hpq hpl hql
+  let m := p ⊔ q
+  have hpm : p ∈ m := by simp
+  have hqm : q ∈ m := by simp 
+  have h : p = q ∨ l = m := point_line_uniq hpl hql hpm hqm 
+  cases h with
+  | inl hpq' => contradiction
+  | inr h' => assumption
+
+theorem connectingLine_comm [ProjectivePlane P] : ∀ (p q: P), p ⊔ q = q ⊔ p := fun p q =>
+  byCases
+    (fun h : q = p => by rw[h])
+    (fun hpq : q ≠ p => by
+      apply connectingLine_uniq <;> (simp ; try assumption)
+    )
+
 noncomputable def intersectionPoint [ProjectivePlane P] (l m : line P) : P := Exists.choose <| exists_intersection_point l m
 
 infix:75 " ⊓ " => intersectionPoint
 
-theorem intersectionPoint_left [ProjectivePlane P] : ∀ l m : line P,  l ⊓ m ∈ l :=
-    λ l m => (Exists.choose_spec (exists_intersection_point l m)).left
-
-theorem intersectionPoint_right [ProjectivePlane P] : ∀ l m : line P,  l ⊓ m ∈ m :=
-    λ l m => (Exists.choose_spec (exists_intersection_point l m)).right
-
-theorem intersectionPoint_uniq [ProjectivePlane P] : ∀ (l m : line P) (p : P), l ≠ m → p ∈ l → p ∈ m → p = l ⊓ m :=
-by intro l m p hlm hpl hpm
-   have hql : l ⊓ m ∈ l:= intersectionPoint_left l m
-   have hqm : l ⊓ m ∈ m:= intersectionPoint_right l m 
-   have h : p = l ⊓ m ∨ l = m := point_line_uniq hpl hql hpm hqm
-   cases h with
-    | inl h' => exact h'
-    | inr hlm' => contradiction
 @[simp] theorem intersectionPoint_left [ProjectivePlane P] : ∀ (l m : line P),  l ⊓ m ∈ l := by
     intro l m
     exact (Exists.choose_spec (exists_intersection_point l m)).left
@@ -103,6 +88,23 @@ by intro l m p hlm hpl hpm
 @[simp] theorem intersectionPoint_right [ProjectivePlane P] : ∀ (l m : line P),  l ⊓ m ∈ m := by
   intro l m
   exact (Exists.choose_spec (exists_intersection_point l m)).right
+
+theorem intersectionPoint_uniq [ProjectivePlane P] : ∀ {l m : line P} {p : P}, l ≠ m → p ∈ l → p ∈ m → p = l ⊓ m := by
+  intro l m p hlm hpl hpm
+  let q :=  l ⊓ m
+  have hql : q ∈ l := by simp
+  have hqm : q ∈ m := by simp 
+  have h : p = q ∨ l = m := point_line_uniq hpl hql hpm hqm
+  cases h with
+  | inl h' => exact h'
+  | inr hlm' => contradiction
+
+theorem intersectionPoint_comm [ProjectivePlane P] : ∀ (l m : line P), l ⊓ m = m ⊓ l := fun l m =>
+  byCases
+    (fun h : m = l => by rw[h])
+    (fun hpq : m ≠ l => by
+      apply intersectionPoint_uniq <;> (simp ; try assumption)
+    )
 
 end ProjectivePlane
 
