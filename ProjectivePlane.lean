@@ -106,6 +106,55 @@ theorem intersectionPoint_comm [ProjectivePlane P] : ∀ (l m : line P), l ⊓ m
       apply intersectionPoint_uniq <;> (simp ; try assumption)
     )
 
+theorem triangle_lines_unequal [ProjectivePlane P] : ¬ collinear p q r -> (p ⊔ q) ≠ (q ⊔ r) ∧ (p ⊔ q) ≠ (r ⊔ p) ∧ (q ⊔ r) ≠ (r ⊔ p) := by
+  intro hnc
+  apply And.intro
+  . intro h
+    simp[collinear] at hnc
+    apply hnc (p ⊔ q)
+    . simp
+    . simp
+    . simp[h]
+  . apply And.intro
+    . intro h
+      simp[collinear] at hnc
+      apply (hnc (p ⊔ q))
+      . simp
+      . simp
+      . simp[h]
+    . intro h
+      simp[collinear] at hnc
+      apply (hnc (q ⊔ r))
+      . simp[h]
+      . simp
+      . simp[h]
+
+theorem dual_triangle [ProjectivePlane P] : ¬ collinear p q r -> ¬ collinear (p ⊔ q) (q ⊔ r) (r ⊔ p) := by
+  let a := p ⊔ q
+  let b := q ⊔ r
+  intro hnc
+  simp[collinear]
+  -- assume there is a point s such on all three lines
+  intro s hpq hqr hrp
+
+  -- s must be equal to q because it is on a and b
+  have hsq : s = q := by
+    have diff_lines : a ≠ b := (triangle_lines_unequal hnc).left
+    have hsq': s = q ∨ a = b := by
+      apply point_line_uniq <;> (simp ; try assumption)
+    cases hsq' with
+    | inl it => exact it
+    | inr not_it => contradiction
+
+  -- that means p q r are collinear -> contradiction
+  have c : collinear p q r := by
+   exists (r ⊔ p)
+   rw[hsq] at hrp
+   simp
+   assumption
+
+  contradiction
+
 end ProjectivePlane
 
 namespace Fano
