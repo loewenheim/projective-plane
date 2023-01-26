@@ -8,14 +8,24 @@ class Geometry (P : Type _) where
 
 attribute [instance] Geometry.incidence
 
-def Geometry.collinear [Geometry P] (p q r : P) : Prop :=
+namespace Geometry
+variable {p q r s: P}
+
+
+def collinear [Geometry P] (p q r : P) : Prop :=
   ∃ l : line P, p ∈ l ∧ q ∈ l ∧ r ∈ l 
 
-def Geometry.isQuadrangle [Geometry P] (p q r s : P) : Prop :=
+def isQuadrangle [Geometry P] (p q r s : P) : Prop :=
     ¬ collinear p q r
   ∧ ¬ collinear p q s
   ∧ ¬ collinear p r s
   ∧ ¬ collinear q r s
+
+instance dual [Geometry P] : Geometry (line P) where
+  line := P
+  incidence := ⟨fun l p => p ∈ l⟩
+
+end Geometry
 
 class ProjectivePlane (P : Type _) extends Geometry P :=
   exists_connecting_line : ∀ p q : P, ∃ l : line, p ∈ l ∧ q ∈ l
