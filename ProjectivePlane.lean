@@ -112,6 +112,8 @@ instance FanoGeometry : Geometry Points where
 line := Lines
 incidence := FanoMembership
 
+attribute [local simp] line
+
 instance (p : Points) (l : Lines) : Decidable (p ∈ l) := by
   cases l <;> rw [FanoMembership] <;> simp <;> infer_instance
 
@@ -169,7 +171,7 @@ def Fano.exists_intersection_point : ∀ (l m : Lines), ∃ p : Points, p ∈ l 
   decide
  
 theorem Fano.quadrangle1236 : Geometry.isQuadrangle Points.p1 Points.p2 Points.p3 Points.p6 :=
-  ⟨by simp[collinear, line], by simp[collinear, line], by simp[collinear, line], by simp[collinear, line]⟩
+  ⟨by simp[collinear], by simp[collinear], by simp[collinear], by simp[collinear]⟩
 
 theorem Fano.point_line_uniq : ∀ {p q : Points} {l m : Lines}, p ∈ l -> q ∈ l -> p ∈ m -> q ∈ m -> p = q ∨ l = m := by
   decide
